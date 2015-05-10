@@ -1015,10 +1015,8 @@ int safe_json_string(json_object *jobj, char *buffer, char *name)
 
   if (jobj)
     {
-      json_object *o;
-      int found;
-      found = json_object_object_get_ex(jobj, name, &o);
-      if (found)
+      json_object *o = json_object_object_get(jobj, name);
+      if (o)
         {
           strcpy (buffer, json_object_get_string(o));
           result = 1;
@@ -1096,17 +1094,13 @@ int cloudfs_connect()
   char access_token[HUBIC_OPTIONS_SIZE];
   char token_type[HUBIC_OPTIONS_SIZE];
   int expire_sec;
-  int found;
-  json_object *o;
 
   if (!safe_json_string(json_obj, access_token, "access_token"))
     return 0;
   if (!safe_json_string(json_obj, token_type, "token_type"))
     return 0;
-
-  found = json_object_object_get_ex(json_obj, "expires_in", &o);
-
-  expire_sec = json_object_get_int(o);
+  expire_sec = json_object_get_int(json_object_object_get(json_obj, "expires_in"));
+  
   debugf ("HUBIC Access token: %s\n", access_token);
   debugf ("HUBIC Token type  : %s\n", token_type);
   debugf ("HUBIC Expire in   : %d\n", expire_sec);
